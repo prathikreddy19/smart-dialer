@@ -1,0 +1,138 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1030" viewBox="0 0 1600 1030" role="img" aria-labelledby="title description">
+  <title id="title">Smart Dialer Backend Architecture</title>
+  <desc id="description">FastAPI requests flow through pacing, safety, and call allocation. Reservations are committed to MySQL before mock provider calls. Provider events return through idempotent state handling. Dataset import, simulation, and metrics also use the database and allocator.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="strokeWidth">
+      <path d="M1,1 L11,6 L1,11 Z" fill="#54718b"/>
+    </marker>
+    <marker id="arrowTeal" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="strokeWidth">
+      <path d="M1,1 L11,6 L1,11 Z" fill="#087f8c"/>
+    </marker>
+    <style>
+      text { font-family: Inter, Segoe UI, Arial, sans-serif; fill: #183247; }
+      .title { font-size: 34px; font-weight: 700; }
+      .subtitle { font-size: 16px; fill: #536d82; }
+      .heading { font-size: 19px; font-weight: 700; }
+      .body { font-size: 15px; fill: #405b70; }
+      .small { font-size: 13px; fill: #526d82; }
+      .lane { font-size: 13px; font-weight: 700; letter-spacing: 1.4px; fill: #71879a; }
+      .box { stroke-width: 2; rx: 18; }
+      .flow { fill: none; stroke: #54718b; stroke-width: 3; marker-end: url(#arrow); }
+      .async { fill: none; stroke: #087f8c; stroke-width: 3; marker-end: url(#arrowTeal); }
+      .dashed { stroke-dasharray: 8 7; }
+    </style>
+  </defs>
+
+  <rect width="1600" height="1030" fill="#f4f7fb"/>
+  <text x="64" y="62" class="title">Smart Dialer Backend Architecture</text>
+  <text x="66" y="92" class="subtitle">Modular monolith · FastAPI · SQLAlchemy · MySQL 8 · interchangeable mock providers</text>
+
+  <text x="64" y="137" class="lane">LIVE DIAL FLOW</text>
+
+  <!-- Main synchronous control path -->
+  <rect x="64" y="158" width="205" height="132" class="box" fill="#ffffff" stroke="#c8d5e1"/>
+  <text x="88" y="194" class="heading">Swagger / Client</text>
+  <text x="88" y="222" class="body">Campaign dial request</text>
+  <text x="88" y="246" class="body">Agent and call APIs</text>
+  <text x="88" y="270" class="body">Simulation and metrics</text>
+
+  <rect x="326" y="158" width="238" height="132" class="box" fill="#eaf2ff" stroke="#4d7fe3"/>
+  <text x="352" y="194" class="heading">FastAPI</text>
+  <text x="352" y="222" class="body">Request validation</text>
+  <text x="352" y="246" class="body">REST routers + services</text>
+  <text x="352" y="270" class="body">Clean JSON errors</text>
+
+  <rect x="622" y="136" width="272" height="176" class="box" fill="#eef8f5" stroke="#42a889"/>
+  <text x="648" y="173" class="heading">Pacing Engine</text>
+  <text x="648" y="204" class="body">Progressive: ≤ available agents</text>
+  <text x="648" y="230" class="body">Predictive: rule-based estimate</text>
+  <text x="648" y="256" class="body">Recommendation only</text>
+  <text x="648" y="284" class="small">Answer rate · duration · provider health</text>
+
+  <rect x="958" y="158" width="244" height="132" class="box" fill="#fff6e8" stroke="#dc9b32"/>
+  <text x="984" y="194" class="heading">Safety Controller</text>
+  <text x="984" y="222" class="body">Approve · reduce · reject</text>
+  <text x="984" y="246" class="body">Progressive fallback</text>
+  <text x="984" y="270" class="small">Hard cap: lockable agents + borrowers</text>
+
+  <rect x="1265" y="158" width="270" height="132" class="box" fill="#f0edff" stroke="#8872d6"/>
+  <text x="1291" y="194" class="heading">Call Allocator</text>
+  <text x="1291" y="222" class="body">Lock agent + borrower</text>
+  <text x="1291" y="246" class="body">Reserve and persist call</text>
+  <text x="1291" y="270" class="small">Commit reservation before provider I/O</text>
+
+  <path d="M269 224 H326" class="flow"/>
+  <path d="M564 224 H622" class="flow"/>
+  <path d="M894 224 H958" class="flow"/>
+  <path d="M1202 224 H1265" class="flow"/>
+
+  <!-- Persistence and provider lane -->
+  <text x="64" y="365" class="lane">DATA, PROVIDER, AND EVENT FLOW</text>
+
+  <rect x="64" y="397" width="316" height="190" class="box" fill="#ffffff" stroke="#c8d5e1"/>
+  <text x="90" y="435" class="heading">CSV Import Service</text>
+  <text x="90" y="466" class="body">Validate headers and required fields</text>
+  <text x="90" y="492" class="body">Normalize values; resolve duplicate IDs</text>
+  <text x="90" y="518" class="body">Validate parent references</text>
+  <text x="90" y="552" class="small">Vendors → campaigns → borrowers → agents → events</text>
+
+  <rect x="480" y="397" width="474" height="250" class="box" fill="#e8f5f7" stroke="#278b98"/>
+  <text x="508" y="438" class="heading">MySQL 8 · SQLAlchemy ORM</text>
+  <text x="508" y="475" class="body">Imported entities and history</text>
+  <text x="508" y="501" class="small">vendors · campaigns · borrowers · agents · calls</text>
+  <text x="508" y="523" class="small">call attempts · agent sessions</text>
+  <text x="508" y="560" class="body">Live dialer state</text>
+  <text x="508" y="586" class="small">agent reservations · dialer calls · provider events</text>
+  <text x="508" y="608" class="small">safety decisions</text>
+  <rect x="500" y="624" width="434" height="1" fill="#9bc7ce"/>
+  <text x="508" y="636" class="small">Transactions + row locks (`FOR UPDATE SKIP LOCKED`)</text>
+
+  <rect x="1058" y="397" width="477" height="168" class="box" fill="#ffffff" stroke="#c8d5e1"/>
+  <text x="1085" y="437" class="heading">Telecom Provider Interface</text>
+  <rect x="1086" y="458" width="191" height="79" rx="12" fill="#eef8f5" stroke="#42a889" stroke-width="1.5"/>
+  <text x="1104" y="489" class="heading" style="font-size:16px">Provider A</text>
+  <text x="1104" y="515" class="small">Fast · reliable</text>
+  <rect x="1300" y="458" width="208" height="79" rx="12" fill="#fff6e8" stroke="#dc9b32" stroke-width="1.5"/>
+  <text x="1318" y="489" class="heading" style="font-size:16px">Provider B</text>
+  <text x="1318" y="515" class="small">Timeouts · duplicate / late events</text>
+
+  <rect x="1058" y="735" width="477" height="154" class="box" fill="#f0edff" stroke="#8872d6"/>
+  <text x="1085" y="776" class="heading">Event Handler + State Machines</text>
+  <text x="1085" y="808" class="body">Idempotent provider event IDs</text>
+  <text x="1085" y="834" class="body">Monotonic call transitions; agent release</text>
+  <text x="1085" y="862" class="small">Agent: AVAILABLE → RESERVED → DIALING → …</text>
+
+  <!-- Commit then dispatch -->
+  <path d="M1400 290 V340 H790 V397" class="flow"/>
+  <text x="1060" y="330" class="small">reserve transaction committed</text>
+  <path d="M954 487 H1058" class="flow"/>
+  <text x="972" y="475" class="small">dispatch after commit</text>
+  <path d="M1296 565 V735" class="async"/>
+  <text x="1312" y="656" class="small">callbacks</text>
+  <path d="M1058 812 H954 V647" class="async"/>
+  <text x="972" y="800" class="small">persist event + state</text>
+
+  <!-- Import, simulation, metrics -->
+  <path d="M445 290 V340 H222 V397" class="flow"/>
+  <text x="250" y="330" class="small">dataset upload</text>
+  <path d="M380 492 H480" class="flow"/>
+
+  <rect x="64" y="735" width="408" height="154" class="box" fill="#ffffff" stroke="#c8d5e1"/>
+  <text x="90" y="776" class="heading">Simulation Engine</text>
+  <text x="90" y="808" class="body">Runs configurable campaign rounds</text>
+  <text x="90" y="834" class="body">Exercises providers, pacing, and safety</text>
+  <text x="90" y="862" class="small">Recovery endpoint cancels stale setup calls</text>
+
+  <rect x="510" y="735" width="444" height="154" class="box" fill="#ffffff" stroke="#c8d5e1"/>
+  <text x="538" y="776" class="heading">Metrics Service</text>
+  <text x="538" y="808" class="body">Agent utilization · call outcomes</text>
+  <text x="538" y="834" class="body">Safety decisions · provider statistics</text>
+  <text x="538" y="862" class="small">Exposed through GET /metrics</text>
+
+  <path d="M472 812 H510" class="flow dashed"/>
+  <path d="M262 735 V690 H1390 V290" class="flow dashed"/>
+  <text x="510" y="706" class="small">simulation requests use the same allocator and safety path</text>
+  <path d="M720 647 V735" class="async"/>
+
+  <text x="64" y="973" class="small">Safety invariant: predictive pacing only recommends; a call is sent only after an agent is reserved and the safety limit is enforced.</text>
+</svg>
