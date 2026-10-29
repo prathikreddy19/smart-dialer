@@ -16,6 +16,14 @@ This is a modular monolith for local evaluation. It intentionally has no fronten
 - **Simulation and metrics:** run multiple dial rounds and inspect utilization, call outcomes, safety decisions, and process-local provider statistics.
 - **CSV import:** imports the seven assignment datasets in parent-first order, resolves duplicate IDs deterministically, validates foreign keys, and reports skipped orphan rows.
 
+## Architecture
+
+![Smart Dialer architecture](docs/architecture-diagram.svg)
+
+The source diagram is [docs/architecture-diagram.svg](docs/architecture-diagram.svg). The pacing engine only recommends a call count; every dialing request passes through the safety controller and allocator before provider dispatch.
+
+## Features
+
 ## Project layout
 
 ```text
